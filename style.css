@@ -1,49 +1,44 @@
-.container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+body {
+    background-color: #f4f4f9; /* Set a light grey background color for the entire page */
 }
 
-.panel {
-    width: 48%;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
+h1 {
+    font-size: 1.5rem; /* Set the font size for h1 headings to 1.5 rem units */
+    color: #333; /* Set the text color for h1 headings to dark grey */
 }
 
-.mt-3 {
-    margin-top: 1rem;
+.card {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Add a subtle shadow to card elements for depth */
+    border-radius: 5px; /* Round the corners of card elements */
 }
 
-.mt-4 {
-    margin-top: 1.5rem;
+.btn {
+    margin-top: 10px; /* Add some space above buttons to separate them from other elements */
 }
 
-/* Base style for all primary buttons */
+/* Styling for primary buttons */
 .btn-primary {
-    background-color: #28a745; /* Green */
-    border-color: #28a745;
-    color: white;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    background-color: #67c037; /* Set a green background color */
+    border-color: #67c037; /* Set a green border color */
+    color: white; /* Set text color to white for contrast */
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition for color changes */
 }
 
-/* Hover state */
+/* Hover state for primary buttons */
 .btn-primary:hover {
-    background-color: #218838; /* Darker green */
-    border-color: #1e7e34;
+    background-color: #adf188; /* Lighten the green background color on hover */
+    border-color: #adf188; /* Lighten the green border color on hover */
 }
 
-/* Active state */
+/* Active state for primary buttons */
 .btn-primary:active {
-    background-color: #1c7430; /* Even darker green */
-    border-color: #1a6829;
+    background-color: #8bea58; /* Darken the green background color when button is active (clicked) */
+    border-color: #8bea58; /* Darken the green border color when button is active */
 }
 
-/* Focus state - ensure focus matches other states */
+/* Focus state for primary buttons - matches active state */
 .btn-primary:focus {
-    background-color: #218838; /* Match hover or base color */
-    border-color: #1e7e34;
-    outline: none; /* Remove default outline */
+    background-color: #8bea58; /* Maintain dark green background color when button is focused */
+    border-color: #8bea58; /* Maintain dark green border color when button is focused */
+    outline: none; /* Remove default focus outline for a cleaner look */
 }
-

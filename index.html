@@ -1,75 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta information for character encoding and responsive design -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Epic and Staff Management</title>
+    <!-- Title of the page -->
+    <title>Staff and Epic Management</title>
+    <!-- Link to Bootstrap CSS for styling and responsive design -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Link to custom CSS file for additional styles -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <!-- First Panel: Free Staff Management -->
-        <div class="panel" id="staff-panel">
-            <h3>Manage Staff availability</h3>
-            <form id="staff-form">
-                <div class="form-group">
-                    <label for="staffFromDate">From Date</label>
-                    <input type="date" id="staffFromDate" class="form-control" required>
+    <!-- Main container for the page content -->
+    <div class="container mt-4">
+        <!-- Bootstrap row for responsive layout -->
+        <div class="row">
+            <!-- Column for the staff management panel, taking half the width on medium screens -->
+            <div class="col-md-6">
+                <!-- Card component for a bordered and shadowed container -->
+                <div class="card mb-4">
+                    <!-- Card body for padding and content -->
+                    <div class="card-body">
+                        <!-- Heading for the staff management section -->
+                        <h1>Manage Staff Availability</h1>
+                        <!-- Form for managing staff availability -->
+                        <form id="staff-form">
+                            <!-- Form row for arranging inputs side by side -->
+                            <div class="form-row">
+                                <!-- Form group for the 'From Date' input -->
+                                <div class="form-group col-md-6">
+                                    <label for="staffFromDate">From Date</label>
+                                    <input type="date" id="staffFromDate" class="form-control" required>
+                                </div>
+                                <!-- Form group for the 'Number of Months' input -->
+                                <div class="form-group col-md-6">
+                                    <label for="numberOfMonths">Number of Months</label>
+                                    <input type="number" id="numberOfMonths" class="form-control" min="1" required>
+                                </div>
+                            </div>
+                            <!-- Button to generate input fields for staff months -->
+                            <button type="button" class="btn btn-primary" onclick="generateStaffInputs()">Generate Inputs</button>
+                            <!-- Submit button to update staff availability -->
+                            <button type="submit" class="btn btn-primary">Update Staff</button>
+                        </form>
+                        <!-- Container for dynamically generated input fields -->
+                        <div id="staff-inputs" class="mt-4">
+                            <!-- Dynamic input fields for staff months will be generated here -->
+                        </div>
+                        <!-- List group for dynamically displaying staff availability -->
+                        <ul id="staff-list" class="list-group mt-4">
+                            <!-- List of staff availability will be dynamically added here -->
+                        </ul>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="staffToDate">To Date</label>
-                    <input type="date" id="staffToDate" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="staffAvailable">Available Staff</label>
-                    <input type="number" id="staffAvailable" class="form-control" min="0" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Update Staff</button>
-            </form>
-            <ul id="staff-list" class="list-group mt-4">
-                <!-- List of staff availability will be dynamically added here -->
-            </ul>
-        </div>
-
-        <!-- Second Panel: Epic Management -->
-        <div class="panel" id="epic-panel">
-            <h3>Generate Epics</h3>
-            <div class="form-group">
-                <label for="numberOfEpics">Number of Epics</label>
-                <input type="number" id="numberOfEpics" class="form-control" min="1" required>
             </div>
-            <button class="btn btn-primary" onclick="displayEpicInputs()">Create Epic Inputs</button>
-
-            <!-- Container for dynamic epic inputs -->
-            <div id="epic-inputs" class="mt-4"></div>
-
-            <button class="btn btn-primary mt-3" onclick="generateEpics()">Generate Epics</button>
-
-            <table class="table mt-4" id="epic-table">
-                <thead>
-                    <tr>
-                        <th>Epic</th>
-                        <th>Start Date</th>
-                        <th>Staff Months</th>
-                        <th>Estimated End Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Epics will be dynamically added here -->
-                </tbody>
-            </table>
+            
+            <!-- Column for the epic management panel, taking half the width on medium screens -->
+            <div class="col-md-6">
+                <!-- Card component for a bordered and shadowed container -->
+                <div class="card mb-4">
+                    <!-- Card body for padding and content -->
+                    <div class="card-body">
+                        <!-- Heading for the epic management section -->
+                        <h1>Manage Epics</h1>
+                        <!-- Form group for the 'Number of Epics' input -->
+                        <div class="form-group">
+                            <label for="numberOfEpics">Number of Epics</label>
+                            <input type="number" id="numberOfEpics" class="form-control" min="1" required>
+                            <!-- Button to generate input fields for epic details -->
+                            <button type="button" class="btn btn-primary" onclick="displayEpicInputs()">Generate Epic Inputs</button>
+                        </div>
+                        <!-- Container for dynamically generated input fields for epics -->
+                        <div id="epic-inputs" class="mt-4">
+                            <!-- Dynamic input fields for epics will be generated here -->
+                        </div>
+                        <!-- Button to calculate and display epic end dates -->
+                        <button type="button" class="btn btn-primary" onclick="generateEpics()">Calculate End Dates</button>
+                        <!-- Table for displaying epic details -->
+                        <table id="epic-table" class="table mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Epic</th>
+                                    <th>Start Date</th>
+                                    <th>Staff Months</th>
+                                    <th>Estimated End Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Epic details will be dynamically added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
+    <!-- Link to JavaScript file for dynamic functionality -->
     <script src="app.js"></script>
 </body>
 </html>
-  <!-- 
-   1. add delete free staff button Done
-   2. automtically delete staff free periods after time passes Done
-   3. update the staff months if a period was deleted Done
-   4. error checking (ex: to date is not before from date)
-   5. Add staff for FW and SW
-
-   -->
