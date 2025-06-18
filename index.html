@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,3 +101,80 @@
     <script src="app.js"></script>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epic and Staff Management</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- First Panel: Free Staff Management -->
+        <div class="panel" id="staff-panel">
+            <h3>Manage Staff availability</h3>
+            <form id="staff-form">
+                <div class="form-group">
+                    <label for="staffFromDate">From Date</label>
+                    <input type="date" id="staffFromDate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="staffToDate">To Date</label>
+                    <input type="date" id="staffToDate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="staffAvailable">Available Staff</label>
+                    <input type="number" id="staffAvailable" class="form-control" min="0" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Staff</button>
+            </form>
+            <ul id="staff-list" class="list-group mt-4">
+                <!-- List of staff availability will be dynamically added here -->
+            </ul>
+        </div>
+
+        <!-- Second Panel: Epic Management -->
+        <div class="panel" id="epic-panel">
+            <h3>Generate Epics</h3>
+            <div class="form-group">
+                <label for="numberOfEpics">Number of Epics</label>
+                <input type="number" id="numberOfEpics" class="form-control" min="1" required>
+            </div>
+            <button class="btn btn-primary" onclick="displayEpicInputs()">Create Epic Inputs</button>
+
+            <!-- Container for dynamic epic inputs -->
+            <div id="epic-inputs" class="mt-4"></div>
+
+            <button class="btn btn-primary mt-3" onclick="generateEpics()">Generate Epics</button>
+
+            <table class="table mt-4" id="epic-table">
+                <thead>
+                    <tr>
+                        <th>Epic</th>
+                        <th>Start Date</th>
+                        <th>Staff Months</th>
+                        <th>Estimated End Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Epics will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+  <!-- 
+   1. add delete free staff button Done
+   2. automtically delete staff free periods after time passes Done
+   3. update the staff months if a period was deleted Done
+   4. error checking (ex: to date is not before from date)
+   5. Add staff for FW and SW
+
+   -->
+>>>>>>> 1ee38e48545ba81d1256dbf08652fe348b8be381
