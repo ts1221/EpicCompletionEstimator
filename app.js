@@ -24,8 +24,12 @@ document.addEventListener('DOMContentLoaded', function() {
         staffInputsContainer.innerHTML = '';
 
         // Validation: Ensure both inputs are valid before proceeding
-        if (!fromDateStr || isNaN(numberOfMonths) || numberOfMonths < 1) {
-            alert('Please enter a valid from date and number of months.');
+        if (!fromDateStr) {
+            alert('Please enter a valid start date');
+            return; // Exit function if validation fails
+        }
+        if (isNaN(numberOfMonths) || numberOfMonths < 1 || !Number.isInteger(numberOfMonths)) {
+            alert('Please enter number of months');
             return; // Exit function if validation fails
         }
 
@@ -54,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
             staffMonthsInput.type = 'number'; // Input type for numeric data
             staffMonthsInput.className = 'form-control'; // Bootstrap class for styling
             staffMonthsInput.min = '0'; // Minimum value constraint
-            staffMonthsInput.id = `staffMonths${i}`; // Unique ID for each input field
+            staffMonthsInput.id = `availableStaffMonths${i}`; // Unique ID for each input field
             staffMonthsInputContainer.appendChild(staffMonthsInput);
 
             // Append label and input containers to the input group
@@ -81,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Loop through each month to process inputs and update data
         for (let i = 0; i < numberOfMonths; i++) {
-            const staffMonths = parseInt(document.getElementById(`staffMonths${i}`).value, 10); // Retrieve staff months input
+            const availableStaffMonths = parseInt(document.getElementById(`availableStaffMonths${i}`).value, 10); // Retrieve staff months input
 
             // Define start and end dates for the staff period
             const startDate = new Date(currentDate);
@@ -92,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const staffPeriod = {
                 fromDate: formatDate(startDate),
                 toDate: formatDate(toDate),
-                available: staffMonths
+                available: availableStaffMonths
             };
 
             // Add staff period to the data array
@@ -168,25 +172,25 @@ document.addEventListener('DOMContentLoaded', function() {
             startDateInput.id = `epicStartDate${i}`; // Unique ID for each start date input
             startDateContainer.appendChild(startDateInput);
 
-            // Create container and input for staff months
-            const staffMonthsContainer = document.createElement('div');
-            staffMonthsContainer.className = 'col';
+            // Create container and input for epic staff months
+            const epicStaffMonthsContainer = document.createElement('div');
+            epicStaffMonthsContainer.className = 'col';
 
-            const staffMonthsLabel = document.createElement('label');
-            staffMonthsLabel.textContent = `Staff Months`; // Label for staff months
-            staffMonthsContainer.appendChild(staffMonthsLabel);
+            const epicStaffMonthsLabel = document.createElement('label');
+            epicStaffMonthsLabel.textContent = `Epic Staff Months`; // Label for staff months
+            epicStaffMonthsContainer.appendChild(epicStaffMonthsLabel);
 
-            const staffMonthsInput = document.createElement('input');
-            staffMonthsInput.type = 'number'; // Input type for numeric data
-            staffMonthsInput.className = 'form-control';
-            staffMonthsInput.min = '1'; // Minimum value constraint
-            staffMonthsInput.id = `staffMonths${i}`; // Unique ID for each staff months input
-            staffMonthsContainer.appendChild(staffMonthsInput);
+            const epicStaffMonthsInput = document.createElement('input');
+            epicStaffMonthsInput.type = 'number'; // Input type for numeric data
+            epicStaffMonthsInput.className = 'form-control';
+            epicStaffMonthsInput.min = '1'; // Minimum value constraint
+            epicStaffMonthsInput.id = `epicStaffMonths${i}`; // Unique ID for each staff months input
+            epicStaffMonthsContainer.appendChild(epicStaffMonthsInput);
 
             // Append all containers to the epic input group
             epicInputGroup.appendChild(epicNameContainer);
             epicInputGroup.appendChild(startDateContainer);
-            epicInputGroup.appendChild(staffMonthsContainer);
+            epicInputGroup.appendChild(epicStaffMonthsContainer);
 
             // Append the epic input group to the main container
             epicInputsContainer.appendChild(epicInputGroup);
@@ -198,33 +202,42 @@ document.addEventListener('DOMContentLoaded', function() {
         const numberOfEpics = document.getElementById('numberOfEpics').value;
         epicTableBody.innerHTML = ''; // Clear previous epic details
 
-        // Loop through each epic to process details and calculate end dates
+        console.log("Number of Epics:", numberOfEpics); 
         for (let i = 0; i < numberOfEpics; i++) {
+            const epicName = document.getElementById(`epicName${i}`).value || `Epic ${i + 1}`;
+            const epicStartDateStr = document.getElementById(`epicStartDate${i}`).value;
+            const epicStaffMonthsInput = document.getElementById(`epicStaffMonths${i}`).value;
+            const epicStaffMonths = parseInt(epicStaffMonthsInput, 10);
+            console.log("Epic Staff Months:", epicStaffMonths); 
+
+            // Validation: Ensure both start date and staff months are provided and valid
+            if (!epicStartDateStr) {
+                alert(`Please enter a valid start date for Epic ${i + 1}`);
+                return; // Exit function if validation fails
+            }
+            if (isNaN(epicStaffMonths) || epicStaffMonths < 1 || !Number.isInteger(epicStaffMonths)) {
+                alert(`Please enter a valid number of staff months for Epic ${i + 1}`);
+                return; // Exit function if validation fails
+            }
+
             const row = document.createElement('tr'); // Create a table row for each epic
 
-            // Retrieve epic name and number, defaulting to 'Epic X' if no name is provided
-            const epicName = document.getElementById(`epicName${i}`).value || `Epic ${i + 1}`;
-            
             const epicCell = document.createElement('td');
             epicCell.textContent = `Epic ${i + 1}: ${epicName}`; // Display both number and name
 
-            const epicStartDateStr = document.getElementById(`epicStartDate${i}`).value;
-            const epicStartDate = new Date(epicStartDateStr); // Convert start date string to Date object
-
             const startDateCell = document.createElement('td');
-            startDateCell.textContent = formatDate(epicStartDate); // Format start date for display
+            startDateCell.textContent = formatDate(new Date(epicStartDateStr)); // Format start date for display
 
-            const staffMonthsCell = document.createElement('td');
-            const staffMonths = parseInt(document.getElementById(`staffMonths${i}`).value, 10); // Parse staff months input
-            staffMonthsCell.textContent = staffMonths;
+            const epicStaffMonthsCell = document.createElement('td');
+            epicStaffMonthsCell.textContent = epicStaffMonths;
 
             try {
                 const endDateCell = document.createElement('td');
-                const estimatedEndDate = calculateEndDate(epicStartDateStr, availableStaffData, staffMonths); // Calculate epic end date
+                const estimatedEndDate = calculateEndDate(epicStartDateStr, availableStaffData, epicStaffMonths); // Calculate epic end date
                 endDateCell.textContent = formatDate(new Date(estimatedEndDate)); // Format end date for display
                 row.appendChild(epicCell);
                 row.appendChild(startDateCell);
-                row.appendChild(staffMonthsCell);
+                row.appendChild(epicStaffMonthsCell);
                 row.appendChild(endDateCell);
             } catch (error) {
                 const errorCell = document.createElement('td');
@@ -238,45 +251,68 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // Function to calculate the end date for an epic based on available staff data
-    function calculateEndDate(startDateStr, availableStaffData, staffMonths) {
-        const startDate = new Date(startDateStr); // Convert start date string to Date object
+    function calculateEndDate(startDateStr, availableStaffData, epicStaffMonths) {
+        // Parse the start date string and create a Date object using UTC
+        const [year, month, day] = startDateStr.split('-');
+        const startDate = new Date(Date.UTC(year, month - 1, day));
+
+        console.log("Epic Start Date (UTC):", formatDate(startDate)); // Log the start date in UTC
 
         // Sort availableStaffData by fromDate to ensure periods are checked in chronological order
         availableStaffData.sort((a, b) => new Date(a.fromDate) - new Date(b.fromDate));
+        console.log("Available Staff Data (sorted):", availableStaffData); // Log sorted available staff data
 
-        let remainingStaffMonths = staffMonths; // Initialize remaining staff months needed to complete the epic
-        let currentDate = startDate; // Start calculation from the epic's start date
-        
+        let remainingEpicStaffMonths = epicStaffMonths; // Initialize remaining staff months needed to complete the epic
+        let currentDate = new Date(startDate); // Start calculation from the epic's start date
+
+        console.log("Remaining Epic Staff Months:", remainingEpicStaffMonths);
+        console.log("Current Date (UTC):", formatDate(currentDate)); // Log current date in UTC
+
+        let counter = 0;
         // Loop through each available staff period to calculate the end date
         for (const period of availableStaffData) {
-            const periodStartDate = new Date(period.fromDate); // Start date of the current staff period
-            const periodEndDate = new Date(period.toDate); // End date of the current staff period
+            console.log("counter: ", counter);
+            counter++;  
+            console.log("Period", period);
+
+            const [periodStartMonth, periodStartDay, periodStartYear] = period.fromDate.split('/');
+            const periodStartDate = new Date(Date.UTC(periodStartYear, periodStartMonth - 1, periodStartDay));
+
+            const [periodEndMonth, periodEndDay, periodEndYear] = period.toDate.split('/');
+            const periodEndDate = new Date(Date.UTC(periodEndYear, periodEndMonth - 1, periodEndDay));
+
+            console.log("Period Start Date (UTC):", formatDate(periodStartDate));
+            console.log("Period End Date (UTC):", formatDate(periodEndDate));
 
             // Skip staff periods that end before the epic's start date
             if (currentDate > periodEndDate) {
+                console.log("Period is being skipped over");
                 continue;
             }
 
             // Align the current date to the start of the period if it's before the period's start
             if (currentDate < periodStartDate) {
-                currentDate = periodStartDate;
+                currentDate = new Date(periodStartDate);
             }
 
             // Calculate the number of full months available in this period
-            const monthsInPeriod = (periodEndDate.getFullYear() - currentDate.getFullYear()) * 12 +
-                                   (periodEndDate.getMonth() - currentDate.getMonth());
+            const monthsInPeriod = (periodEndDate.getUTCFullYear() - currentDate.getUTCFullYear()) * 12 +
+                                   (periodEndDate.getUTCMonth() - currentDate.getUTCMonth());
 
             const staffMonthsAvailable = monthsInPeriod * period.available; // Total staff months available in this period
 
+            console.log("Months In Period:", monthsInPeriod);
+            console.log("Staff Months Available:", staffMonthsAvailable);
+
             // Check if the available staff months can fulfill the remaining staff months needed
-            if (remainingStaffMonths <= staffMonthsAvailable) {
-                const monthsNeeded = Math.ceil(remainingStaffMonths / period.available); // Calculate months needed to complete the epic
-                currentDate.setMonth(currentDate.getMonth() + monthsNeeded); // Advance the current date by the months needed
-                return currentDate.toISOString().split('T')[0]; // Return the calculated end date in YYYY-MM-DD format
+            if (remainingEpicStaffMonths <= staffMonthsAvailable) {
+                const monthsNeeded = Math.ceil(remainingEpicStaffMonths / period.available);
+                currentDate.setUTCMonth(currentDate.getUTCMonth() + monthsNeeded);
+                return formatDate(currentDate); // Return the calculated end date in MM/DD/YYYY format
             } else {
-                remainingStaffMonths -= staffMonthsAvailable; // Deduct used staff months from remaining
-                currentDate = new Date(periodEndDate); // Move current date to the end of the period
-                currentDate.setMonth(currentDate.getMonth() + 1); // Advance to the start of the next period
+                remainingEpicStaffMonths -= staffMonthsAvailable;
+                currentDate = new Date(periodEndDate);
+                currentDate.setUTCMonth(currentDate.getUTCMonth() + 1); // Advance to the start of the next period
             }
         }
 

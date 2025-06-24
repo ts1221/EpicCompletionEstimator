@@ -30,7 +30,7 @@
                             <div class="form-row">
                                 <!-- Form group for the 'From Date' input -->
                                 <div class="form-group col-md-6">
-                                    <label for="staffFromDate">From Date</label>
+                                    <label for="staffFromDate">Start Date</label>
                                     <input type="date" id="staffFromDate" class="form-control" required>
                                 </div>
                                 <!-- Form group for the 'Number of Months' input -->
@@ -70,13 +70,14 @@
                             <input type="number" id="numberOfEpics" class="form-control" min="1" required>
                             <!-- Button to generate input fields for epic details -->
                             <button type="button" class="btn btn-primary" onclick="displayEpicInputs()">Generate Epic Inputs</button>
+                            <!-- Button to calculate and display epic end dates -->
+                            <button type="button" class="btn btn-primary" onclick="generateEpics()">Calculate End Dates</button>
                         </div>
                         <!-- Container for dynamically generated input fields for epics -->
                         <div id="epic-inputs" class="mt-4">
                             <!-- Dynamic input fields for epics will be generated here -->
                         </div>
-                        <!-- Button to calculate and display epic end dates -->
-                        <button type="button" class="btn btn-primary" onclick="generateEpics()">Calculate End Dates</button>
+                       
                         <!-- Table for displaying epic details -->
                         <table id="epic-table" class="table mt-4">
                             <thead>
