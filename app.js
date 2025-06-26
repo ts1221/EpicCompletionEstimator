@@ -7,130 +7,181 @@ document.addEventListener('DOMContentLoaded', function() {
     const staffInputsContainer = document.getElementById('staff-inputs'); // Container for dynamically generated staff month inputs
     const staffList = document.getElementById('staff-list'); // List element to display staff availability periods
 
+    const addMonthBtn = document.getElementById('addMonthBtn');
+
     // Cache DOM elements related to epic management
     const epicTableBody = document.getElementById('epic-table').querySelector('tbody'); // Table body for displaying epic details
     const epicInputsContainer = document.getElementById('epic-inputs'); // Container for dynamically generated epic inputs
 
+    // Added variables to reference the input fields
+    const fromDateGroup = document.querySelector('#staffFromDate').closest('.form-group');
+    const numberOfMonthsGroup = document.querySelector('#numberOfMonths').closest('.form-group');
+    
     // Initialize an array to store periods of available staff data
     let availableStaffData = [];
 
-    // Function to generate dynamic input fields for staff months based on user input
+
     window.generateStaffInputs = function() {
-        // Retrieve the 'From Date' input value and parse 'Number of Months'
         const fromDateStr = document.getElementById('staffFromDate').value;
         const numberOfMonths = parseInt(document.getElementById('numberOfMonths').value, 10);
 
-        // Clear any existing input fields in the container
+        if (!fromDateStr || isNaN(numberOfMonths) || numberOfMonths < 1) {
+            alert('Please enter a valid start date and number of months.');
+            return;
+        }
+
+        currentDate = new Date(`${fromDateStr}T00:00:00Z`);
         staffInputsContainer.innerHTML = '';
 
-        // Validation: Ensure both inputs are valid before proceeding
-        if (!fromDateStr) {
-            alert('Please enter a valid start date');
-            return; // Exit function if validation fails
-        }
-        if (isNaN(numberOfMonths) || numberOfMonths < 1 || !Number.isInteger(numberOfMonths)) {
-            alert('Please enter number of months');
-            return; // Exit function if validation fails
-        }
-
-        // Create a Date object starting at the 'From Date' provided by the user
-        let currentDate = new Date(`${fromDateStr}T00:00:00Z`);
-
-        // Loop through each month to generate corresponding input fields
         for (let i = 0; i < numberOfMonths; i++) {
-            // Create a container for the input group
-            const monthInputGroup = document.createElement('div');
-            monthInputGroup.className = 'form-row align-items-center mb-3'; // Use Bootstrap classes for styling
-
-            // Create a label container and label for the current month
-            const monthLabelContainer = document.createElement('div');
-            monthLabelContainer.className = 'col-auto'; // Bootstrap class for auto-sizing
-
-            const monthLabel = document.createElement('label');
-            monthLabel.textContent = `Month ${i + 1}: ${formatDate(currentDate)}`; // Display month number and date
-            monthLabelContainer.appendChild(monthLabel);
-
-            // Create an input container for the staff months input
-            const staffMonthsInputContainer = document.createElement('div');
-            staffMonthsInputContainer.className = 'col'; // Bootstrap class to fill remaining space
-
-            const staffMonthsInput = document.createElement('input');
-            staffMonthsInput.type = 'number'; // Input type for numeric data
-            staffMonthsInput.className = 'form-control'; // Bootstrap class for styling
-            staffMonthsInput.min = '0'; // Minimum value constraint
-            staffMonthsInput.id = `availableStaffMonths${i}`; // Unique ID for each input field
-            staffMonthsInputContainer.appendChild(staffMonthsInput);
-
-            // Append label and input containers to the input group
-            monthInputGroup.appendChild(monthLabelContainer);
-            monthInputGroup.appendChild(staffMonthsInputContainer);
-
-            // Append the entire input group to the main container
-            staffInputsContainer.appendChild(monthInputGroup);
-
-            // Move to the next month for subsequent iteration
+            addMonthInput(i);
             currentDate.setUTCMonth(currentDate.getUTCMonth() + 1);
         }
+
+        checkInputs(); // Initial check to set the update button visibility
     };
 
-    // Event listener for staff form submission to update staff availability data
+    function addMonthInput(monthIndex) {
+        const monthInputGroup = document.createElement('div');
+        monthInputGroup.className = 'form-row align-items-center mb-3';
+
+        const monthLabelContainer = document.createElement('div');
+        monthLabelContainer.className = 'col-auto';
+
+        const monthLabel = document.createElement('label');
+        monthLabel.textContent = `Month ${monthIndex + 1}: ${formatDate(currentDate)}`;
+        monthLabelContainer.appendChild(monthLabel);
+
+        const staffMonthsInputContainer = document.createElement('div');
+        staffMonthsInputContainer.className = 'col';
+
+        const staffMonthsInput = document.createElement('input');
+        staffMonthsInput.type = 'number';
+        staffMonthsInput.className = 'form-control';
+        staffMonthsInput.min = '0';
+        staffMonthsInput.id = `availableStaffMonths${monthIndex}`;
+        staffMonthsInput.addEventListener('input', checkInputs); // Check inputs on change
+        staffMonthsInputContainer.appendChild(staffMonthsInput);
+
+        monthInputGroup.appendChild(monthLabelContainer);
+        monthInputGroup.appendChild(staffMonthsInputContainer);
+        staffInputsContainer.appendChild(monthInputGroup);
+    }
+
+    function checkInputs() {
+        const inputs = document.querySelectorAll('[id^="availableStaffMonths"]');
+        const allFieldsFilled = Array.from(inputs).every(input => {
+            const value = parseInt(input.value, 10);
+            return !isNaN(value) && value >= 0;
+        });
+
+        updateStaffBtn.style.display = allFieldsFilled ? 'inline-block' : 'none';
+    }
+
     staffForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission behavior
-
-        // Retrieve and parse input values again for processing
-        const fromDateStr = document.getElementById('staffFromDate').value;
+        event.preventDefault();
         const numberOfMonths = parseInt(document.getElementById('numberOfMonths').value, 10);
+        currentDate = new Date(`${document.getElementById('staffFromDate').value}T00:00:00Z`);
 
-        let currentDate = new Date(`${fromDateStr}T00:00:00Z`);
-
-        // Loop through each month to process inputs and update data
         for (let i = 0; i < numberOfMonths; i++) {
-            const availableStaffMonths = parseInt(document.getElementById(`availableStaffMonths${i}`).value, 10); // Retrieve staff months input
+            const availableStaffMonthsInput = document.getElementById(`availableStaffMonths${i}`).value;
+            const availableStaffMonths = parseInt(availableStaffMonthsInput, 10);
 
-            // Define start and end dates for the staff period
+            if (isNaN(availableStaffMonths) || availableStaffMonths < 0) {
+                alert(`Please enter a valid number of available staff months for Month ${i + 1}`);
+                return;
+            }
+
             const startDate = new Date(currentDate);
             currentDate.setUTCMonth(currentDate.getUTCMonth() + 1);
             const toDate = new Date(currentDate);
 
-            // Create a staff period object with formatted dates and availability
             const staffPeriod = {
                 fromDate: formatDate(startDate),
                 toDate: formatDate(toDate),
                 available: availableStaffMonths
             };
 
-            // Add staff period to the data array
-            availableStaffData.push(staffPeriod);
+            const isDuplicate = availableStaffData.some(period =>
+                period.fromDate === staffPeriod.fromDate &&
+                period.toDate === staffPeriod.toDate
+            );
 
-            // Add staff period to the display list
-            addStaffPeriodToList(staffPeriod);
+            if (!isDuplicate) {
+                availableStaffData.push(staffPeriod);
+                addStaffPeriodToList(staffPeriod);
+            } else {
+                alert(`A staff period from ${staffPeriod.fromDate} to ${staffPeriod.toDate} already exists.`);
+            }
         }
+
+        // Clear the input fields after updating the staff data
+        staffInputsContainer.innerHTML = '';
+
+        // Hide the start date and number of months input groups
+        fromDateGroup.style.display = 'none';
+        numberOfMonthsGroup.style.display = 'none';
+
+        // Hide the update button
+        updateStaffBtn.remove();
+
+        // Ensure the generate inputs button doesn't reappear
+        generateInputsBtn.style.display = 'none';
+
+        // Show the add month button
+        addMonthBtn.style.display = 'inline-block';
     });
 
-    // Function to add a staff period to the list display with deletion capability
-    function addStaffPeriodToList(staffPeriod) {
-        // Create a list item element
-        const listItem = document.createElement('li');
-        listItem.className = 'list-group-item'; // Bootstrap styling class
-        listItem.textContent = `From: ${staffPeriod.fromDate}, To: ${staffPeriod.toDate}, Available Staff: ${staffPeriod.available}`;
+    addMonthBtn.addEventListener('click', function() {
+        if (availableStaffData.length > 0) {
+            const lastPeriod = availableStaffData[availableStaffData.length - 1];
+            currentDate = new Date(lastPeriod.toDate);
+        }
 
-        // Create a delete button for removing the staff period
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete'; // Button label
-        deleteButton.className = 'btn btn-danger btn-sm'; // Bootstrap styling class for small red button
-        deleteButton.onclick = function() {
-            // Find and remove the staff period from the data array
-            const index = availableStaffData.indexOf(staffPeriod);
-            if (index > -1) {
-                availableStaffData.splice(index, 1);
-                staffList.removeChild(listItem); // Remove the list item from the display
+        const newMonthIndex = availableStaffData.length;
+        addMonthInput(newMonthIndex);
+
+        // Disable the add month button until the current month is confirmed
+        addMonthBtn.disabled = true;
+
+        const staffMonthsInput = document.getElementById(`availableStaffMonths${newMonthIndex}`);
+        const addMonthConfirmBtn = document.createElement('button');
+        addMonthConfirmBtn.textContent = 'Confirm Add Month';
+        addMonthConfirmBtn.className = 'btn btn-success mt-2';
+        addMonthConfirmBtn.addEventListener('click', function() {
+            const availableStaffMonths = parseInt(staffMonthsInput.value, 10);
+
+            if (!isNaN(availableStaffMonths) && availableStaffMonths >= 0) {
+                const startDate = new Date(currentDate);
+                currentDate.setUTCMonth(currentDate.getUTCMonth() + 1);
+                const toDate = new Date(currentDate);
+
+                const staffPeriod = {
+                    fromDate: formatDate(startDate),
+                    toDate: formatDate(toDate),
+                    available: availableStaffMonths
+                };
+
+                availableStaffData.push(staffPeriod);
+                addStaffPeriodToList(staffPeriod);
+
+                // Clear the new month input after adding
+                staffInputsContainer.innerHTML = '';
+
+                // Re-enable the add month button after confirming
+                addMonthBtn.disabled = false;
+            } else {
+                alert('Please enter a valid number of available staff months.');
             }
-        };
+        });
 
-        // Append delete button to the list item
-        listItem.appendChild(deleteButton);
+        staffInputsContainer.appendChild(addMonthConfirmBtn);
+    });
 
-        // Append the list item to the staff list
+    function addStaffPeriodToList(staffPeriod) {
+        const listItem = document.createElement('li');
+        listItem.className = 'list-group-item';
+        listItem.textContent = `From: ${staffPeriod.fromDate}, To: ${staffPeriod.toDate}, Available Staff: ${staffPeriod.available}`;
         staffList.appendChild(listItem);
     }
 

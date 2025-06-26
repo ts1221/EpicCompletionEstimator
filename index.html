@@ -40,9 +40,12 @@
                                 </div>
                             </div>
                             <!-- Button to generate input fields for staff months -->
-                            <button type="button" class="btn btn-primary" onclick="generateStaffInputs()">Generate Inputs</button>
+                            <button type="button" id="generateInputsBtn" class="btn btn-primary" onclick="generateStaffInputs()">Generate Inputs</button>
                             <!-- Submit button to update staff availability -->
-                            <button type="submit" class="btn btn-primary">Update Staff</button>
+                            <button type="submit" id="updateStaffBtn" class="btn btn-primary" style="display: none;">Update Staff</button>
+                            <!-- Add this button to your HTML, initially hidden -->
+                            <button type="button" id="addMonthBtn" class="btn btn-secondary mt-3" style="display: none;">Add Month</button>
+
                         </form>
                         <!-- Container for dynamically generated input fields -->
                         <div id="staff-inputs" class="mt-4">
