@@ -298,15 +298,13 @@ window.generateStaffInputs = function() {
 
 
 function calculateEndDate(startDateStr, availableStaffData, epicStaffMonths) {
-    let startDate = new Date(startDateStr);
+      let currentDate = new Date(startDateStr);
     let remainingStaffMonths = epicStaffMonths;
-    let currentDate = new Date(startDate);
 
-    console.log("1. Epic Start Date (UTC):", formatDate(startDate));
-    console.log("2. Epic SM: ", epicStaffMonths);
+    console.log("1. Epic Start Date:", formatDate(currentDate));
+    console.log("2. Epic Staff Months: ", epicStaffMonths);
     console.log("3. Available Staff Data:", availableStaffData);
 
-    // Iterate through the available staff data
     for (let period of availableStaffData) {
         const fromDate = new Date(period.fromDate);
         const toDate = new Date(period.toDate);
@@ -317,13 +315,19 @@ function calculateEndDate(startDateStr, availableStaffData, epicStaffMonths) {
         }
 
         // Calculate the number of days in this period, inclusive
-        const periodDays = (toDate - currentDate) / (1000 * 60 * 60 * 24) + 1;
+        const periodDays = Math.floor((toDate - currentDate) / (1000 * 60 * 60 * 24)) + 1;
+
+        console.log("4. Period days: ", periodDays);
+        console.log("5. available: ", period.available);
+
+        if (periodDays < 0) {
+            console.warn("Warning: currentDate is after toDate, skipping period.");
+            continue;
+        }
 
         // Calculate the number of staff months this period contributes
         const staffContribution = (period.available * periodDays) / 30; // Approximate a month as 30 days
 
-        console.log("4. Period days: ", periodDays);
-        console.log("5. available: ", period.available);
         console.log("6. Staff contribution: ", staffContribution);
 
         if (staffContribution >= remainingStaffMonths) {
@@ -334,11 +338,10 @@ function calculateEndDate(startDateStr, availableStaffData, epicStaffMonths) {
         } else {
             remainingStaffMonths -= staffContribution;
             currentDate = new Date(toDate);
-            currentDate.setDate(currentDate.getDate() + 1); // Move to the next day after the period end
+            currentDate.setDate(currentDate.getDate() + 1); // Advance to the next day after the period end
         }
     }
 
-    // If we exit the loop, not enough staff months are available
     throw new Error("Not enough staff months available to complete the epic.");
 }
 
@@ -433,21 +436,6 @@ function calculateEndDate(startDateStr, availableStaffData, epicStaffMonths) {
         const day = String(date.getUTCDate()).padStart(2, '0'); // Ensure day is two digits
         return `${month}/${day}/${year}`; // Concatenate formatted date string
     }
-
-    // Save input
-    const inputElement = document.getElementById('myInput');
-    inputElement.addEventListener('input', function() {
-    localStorage.setItem('userInput', inputElement.value);
-    });
-
-    // Retrieve input on page load
-    window.addEventListener('load', function() {
-    const savedInput = localStorage.getItem('userInput');
-    if (savedInput) {
-        inputElement.value = savedInput;
-    }
-    });
-
 });
 
 
