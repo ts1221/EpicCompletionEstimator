@@ -70,11 +70,11 @@
                         <!-- Form group for the 'Number of Epics' input -->
                         <div class="form-group">
                             <label for="numberOfEpics">Number of Epics</label>
-                            <input type="number" id="numberOfEpics" class="form-control" min="1" required>
+                            <input type="number" id="numberOfEpics" class="form-control" min="1" step="1" required>
                             <!-- Button to generate input fields for epic details -->
-                            <button type="button" class="btn btn-primary" onclick="displayEpicInputs()">Generate Epic Inputs</button>
+                            <button type="button" id="displayEpicInputsBtn" class="btn btn-primary" onclick="validateAndDisplayEpics()">Generate Epic Inputs</button>
                             <!-- Button to calculate and display epic end dates -->
-                            <button type="button" class="btn btn-primary" onclick="generateEpics()">Calculate End Dates</button>
+                            <button type="button" id="calculateBtn" class="btn btn-primary" onclick="generateEpics()" style="display: none;">Calculate End Dates</button>
                         </div>
                         <!-- Container for dynamically generated input fields for epics -->
                         <div id="epic-inputs" class="mt-4">

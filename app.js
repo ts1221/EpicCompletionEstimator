@@ -7,12 +7,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const staffForm = document.getElementById('staff-form'); // Form element for managing staff availability
     const staffInputsContainer = document.getElementById('staff-inputs'); // Container for dynamically generated staff month inputs
     const staffList = document.getElementById('staff-list'); // List element to display staff availability periods
-
+    
+    const generateInputsBtn = document.getElementById('generateInputsBtn');
+    const updateStaffBtn = document.getElementById('updateStaffBtn');
     const addMonthBtn = document.getElementById('addMonthBtn');
 
     // Cache DOM elements related to epic management
     const epicTableBody = document.getElementById('epic-table').querySelector('tbody'); // Table body for displaying epic details
     const epicInputsContainer = document.getElementById('epic-inputs'); // Container for dynamically generated epic inputs
+    const calculateBtn = document.getElementById('calculateBtn');
 
     // Added variables to reference the input fields
     const fromDateGroup = document.querySelector('#staffFromDate').closest('.form-group');
@@ -69,6 +72,21 @@ window.generateStaffInputs = function() {
     }
 
     function getNextMonthDate(date) {
+
+
+
+        // const year = date.getUTCFullYear();
+        // const month = date.getUTCMonth();
+        // const day = date.getUTCDate();
+
+        // const nextMonth = new Date(Date.UTC(year, month + 1, 1));
+
+        // const daysInNextMonth = new Date(Date.UTC(nextMonth.getUTCFullYear, nextMonth.getUTCMonth() + 1, 0)).getUTCDate();
+
+        // const lastDay = Math.min(day, daysInNextMonth);
+        // return new Date(Date.UTC(nextMonth.getUTCFullYear(), nextMonth.getUTCMonth(), lastDay));
+
+
         const newDate = new Date(date);
         newDate.setUTCDate(1); // Start at the first of the month to avoid rolling over
         newDate.setUTCMonth(newDate.getUTCMonth() + 1);
@@ -180,6 +198,38 @@ window.generateStaffInputs = function() {
         staffList.appendChild(listItem);
     }
 
+    // function normalizedDate(d) {
+    //     const date = new Date(d);
+    //     date.setHours(0, 0, 0, 0);
+    //     return date;    
+    // }
+
+
+    function checkEpicInputs() {
+        const rows = document.querySelectorAll('#epic-inputs .form-row');
+
+        const allFilled = Array.from(rows).every(row => {
+
+            const [name, date, staff] = row.querySelectorAll('input');
+            return date.value !== '' && staff.value !== '';
+        });
+
+        calculateBtn.style.display = allFilled ? 'inline-block' : 'none';
+    }
+
+    window.validateAndDisplayEpics = function () {
+        const numEpicsInput = document.getElementById('numberOfEpics');
+        const value = parseInt(numEpicsInput.value, 10);
+
+        if (isNaN(value) || value < 1 || !Number.isInteger(value)) {
+            alert('Please enter a valid number of epics');
+            return;
+        }
+
+        displayEpicInputs();
+
+    };
+
     // Function to generate dynamic input fields for epics based on user input
     window.displayEpicInputs = function() {
         const numberOfEpics = document.getElementById('numberOfEpics').value;
@@ -195,7 +245,7 @@ window.generateStaffInputs = function() {
             epicNameContainer.className = 'col-auto';
 
             const epicNameLabel = document.createElement('label');
-            epicNameLabel.textContent = `Epic ${i + 1} Name`; // Label for epic name
+            epicNameLabel.textContent = `Epic ${i + 1} Name (Optional)`; // Label for epic name
             epicNameContainer.appendChild(epicNameLabel);
 
             const epicNameInput = document.createElement('input');
@@ -241,6 +291,13 @@ window.generateStaffInputs = function() {
             // Append the epic input group to the main container
             epicInputsContainer.appendChild(epicInputGroup);
         }
+
+        const epicInputs = document.querySelectorAll('#epic-inputs input');
+        epicInputs.forEach(input => {
+            input.addEventListener('input', checkEpicInputs);  
+        });
+
+        checkEpicInputs();
     };
 
     // Function to generate epic details and calculate their end dates based on staff data
@@ -252,6 +309,15 @@ window.generateStaffInputs = function() {
         for (let i = 0; i < numberOfEpics; i++) {
             const epicName = document.getElementById(`epicName${i}`).value || `Epic ${i + 1}`;
             const epicStartDateStr = document.getElementById(`epicStartDate${i}`).value;
+            
+            // stop user from entering a epic start date if no staff are free at that start date
+            const earliestStaff = availableStaffData.map(p => new Date(p.fromDate)).sort((a,b) => a - b)[0];
+
+            const epicStart = new Date(`${epicStartDateStr}T00:00:00`);
+            if (epicStart < earliestStaff) {
+                alert(`No staff available until ${formatDate(earliestStaff)}. Please move epic ${i+1} to that date or later`);
+                return;
+            }
             const epicStaffMonthsInput = document.getElementById(`epicStaffMonths${i}`).value;
             const epicStaffMonths = parseInt(epicStaffMonthsInput, 10);
             // console.log("Epic Staff Months:", epicStaffMonths); 
@@ -294,6 +360,7 @@ window.generateStaffInputs = function() {
 
             epicTableBody.appendChild(row); // Append the row to the table body
         }
+
     };
 
 
@@ -321,25 +388,27 @@ window.generateStaffInputs = function() {
             console.log("4. Period days: ", periodDays);
             console.log("5. available: ", period.available);
 
-            if (periodDays < 0) {
+            if (periodDays < 0 || period.available <= 0) {
                 console.warn("Warning: currentDate is after toDate, skipping period.");
                 continue;
             }
 
             // Calculate the number of staff months this period contributes
-            const staffPeriodAvailability = (period.available * periodDays) / 30; // Approximate a month as 30 days
+            const maxStaffThisPeriod = (period.available * periodDays) / 30; // Approximate a month as 30 days
 
-            console.log("6. Staff Period Availability: ", staffPeriodAvailability);
+            console.log("6. Staff Period Availability: ", maxStaffThisPeriod);
             console.log("7. Remaining Staff Months: ", epicRemainingStaffMonths);
-            if (staffPeriodAvailability >= epicRemainingStaffMonths) {
+            if (maxStaffThisPeriod >= epicRemainingStaffMonths) {
                 // Calculate the exact end date within this period
                 console.log("GOES INTO IF");
+        
                 const daysNeeded = (epicRemainingStaffMonths * 30) / period.available;
+                period.available -= epicRemainingStaffMonths;
                 currentDate.setDate(currentDate.getDate() + Math.ceil(daysNeeded) - 1);
                 return currentDate;
             } else {
                 console.log("GOES INTO ELSE");
-                epicRemainingStaffMonths -= staffPeriodAvailability;
+                epicRemainingStaffMonths -= maxStaffThisPeriod;
                 currentDate = new Date(toDate);
                 currentDate.setDate(currentDate.getDate() + 1); // Advance to the next day after the period end
             }
