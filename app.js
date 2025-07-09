@@ -24,6 +24,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize an array to store periods of available staff data
     let availableStaffData = [];
 
+
+function getNthMonthDate(startDate, n) {
+    const year = startDate.getUTCFullYear();
+    const month = startDate.getUTCMonth();
+    const day = startDate.getUTCDate();
+
+    const result = new Date(Date.UTC(year, month + n, day));
+
+    if (result.getUTCMonth() !== (month + n) % 12) {
+        return new Date(Date.UTC(year, month + n + 1, 0));
+    }
+
+    return result;
+}
+
 window.generateStaffInputs = function() {
         const fromDateStr = document.getElementById('staffFromDate').value;
         const numberOfMonths = parseInt(document.getElementById('numberOfMonths').value, 10);
@@ -33,12 +48,16 @@ window.generateStaffInputs = function() {
             return;
         }
 
-        let currentDate = new Date(`${fromDateStr}T00:00:00Z`);
+        const startDate = new Date(`${fromDateStr}T00:00:00Z`);
+
+
+
         staffInputsContainer.innerHTML = '';
 
         for (let i = 0; i < numberOfMonths; i++) {
-            addMonthInput(i, currentDate);
-            currentDate = getNextMonthDate(currentDate);
+
+            const targetDate = getNthMonthDate(startDate, i);
+            addMonthInput(i, targetDate);
         }
 
         checkInputs();
