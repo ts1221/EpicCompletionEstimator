@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const epicTableBody = document.getElementById('epic-table').querySelector('tbody'); // Table body for displaying epic details
     const epicInputsContainer = document.getElementById('epic-inputs'); // Container for dynamically generated epic inputs
     const calculateBtn = document.getElementById('calculateBtn');
+    // const addEpicBtn = document.getElementById('addEpicBtn');
 
     // Added variables to reference the input fields
     const fromDateGroup = document.querySelector('#staffFromDate').closest('.form-group');
@@ -75,15 +76,51 @@ window.generateStaffInputs = function() {
         monthLabelContainer.appendChild(monthLabel);
 
         const staffMonthsInputContainer = document.createElement('div');
-        staffMonthsInputContainer.className = 'col';
+        staffMonthsInputContainer.className = 'col-auto d-flex align-items-center';
 
+
+        // decrement button
+        // const decrementBtn = document.createElement('button');
+        // decrementBtn.type = 'button';
+        // decrementBtn.className = 'btn btn-outline-secondary btn-sm mr-2';
+        // decrementBtn.textContent = '-';
+        // decrementBtn.addEventListener('click', () => {
+        //     const input = document.getElementById(`availableStaffMonths${monthIndex}`);
+        //     let val = parseInt(input.value, 10) || 0;
+        //     if (val > 0) {
+        //         input.value = val - 1;
+        //         checkInputs();
+        //     }
+        // });
+
+
+        // input element 
         const staffMonthsInput = document.createElement('input');
         staffMonthsInput.type = 'number';
         staffMonthsInput.className = 'form-control';
         staffMonthsInput.min = '0';
         staffMonthsInput.id = `availableStaffMonths${monthIndex}`;
         staffMonthsInput.addEventListener('input', checkInputs);
+
+
+        // increment button
+        // const incrementBtn = document.createElement('button');
+        // incrementBtn.type = 'button';
+        // incrementBtn.className = 'btn btn-outline-secondary btn-sm mr-2';
+        // incrementBtn.textContent = '+';
+        // incrementBtn.addEventListener('click', () => {
+        //     const input = document.getElementById(`availableStaffMonths${monthIndex}`);
+        //     let val = parseInt(input.value, 10) || 0;
+        //     if (val > 0) {
+        //         input.value = val + 1;
+        //         checkInputs();
+        //     }
+        // });
+
+        
+        // staffMonthsInputContainer.appendChild(decrementBtn);
         staffMonthsInputContainer.appendChild(staffMonthsInput);
+        // staffMonthsInputContainer.appendChild(incrementBtn);
 
         monthInputGroup.appendChild(monthLabelContainer);
         monthInputGroup.appendChild(staffMonthsInputContainer);
@@ -318,68 +355,66 @@ window.generateStaffInputs = function() {
 
         checkEpicInputs();
     };
-
-    // Function to generate epic details and calculate their end dates based on staff data
     window.generateEpics = function() {
-        const numberOfEpics = document.getElementById('numberOfEpics').value;
+        const numberOfEpics = parseInt(document.getElementById('numberOfEpics').value, 10);
         epicTableBody.innerHTML = ''; // Clear previous epic details
 
-        // console.log("Number of Epics:", numberOfEpics); 
+        // Deep copy staff data once, to track cumulative availability consumption
+        const staffDataCopy = JSON.parse(JSON.stringify(availableStaffData));
+
         for (let i = 0; i < numberOfEpics; i++) {
             const epicName = document.getElementById(`epicName${i}`).value || `Epic ${i + 1}`;
             const epicStartDateStr = document.getElementById(`epicStartDate${i}`).value;
-            
-            // stop user from entering a epic start date if no staff are free at that start date
-            const earliestStaff = availableStaffData.map(p => new Date(p.fromDate)).sort((a,b) => a - b)[0];
 
+            if (!epicStartDateStr) {
+                alert(`Please enter a valid start date for Epic ${i + 1}`);
+                return;
+            }
+
+            const epicStaffMonthsInput = document.getElementById(`epicStaffMonths${i}`).value;
+            const epicStaffMonths = parseInt(epicStaffMonthsInput, 10);
+
+            if (isNaN(epicStaffMonths) || epicStaffMonths < 1) {
+                alert(`Please enter a valid number of staff months for Epic ${i + 1}`);
+                return;
+            }
+
+            // Validate start date against earliest staff availability (optional, keep your existing check)
+            const earliestStaff = availableStaffData.map(p => new Date(p.fromDate)).sort((a,b) => a - b)[0];
             const epicStart = new Date(`${epicStartDateStr}T00:00:00`);
             if (epicStart < earliestStaff) {
                 alert(`No staff available until ${formatDate(earliestStaff)}. Please move epic ${i+1} to that date or later`);
                 return;
             }
-            const epicStaffMonthsInput = document.getElementById(`epicStaffMonths${i}`).value;
-            const epicStaffMonths = parseInt(epicStaffMonthsInput, 10);
-            // console.log("Epic Staff Months:", epicStaffMonths); 
 
-            // Validation: Ensure both start date and staff months are provided and valid
-            if (!epicStartDateStr) {
-                alert(`Please enter a valid start date for Epic ${i + 1}`);
-                return; // Exit function if validation fails
-            }
-            if (isNaN(epicStaffMonths) || epicStaffMonths < 1 || !Number.isInteger(epicStaffMonths)) {
-                alert(`Please enter a valid number of staff months for Epic ${i + 1}`);
-                return; // Exit function if validation fails
-            }
-
-            const row = document.createElement('tr'); // Create a table row for each epic
-
+            const row = document.createElement('tr');
             const epicCell = document.createElement('td');
-            epicCell.textContent = `Epic ${i + 1}: ${epicName}`; // Display both number and name
+            epicCell.textContent = `Epic ${i + 1}: ${epicName}`;
 
             const startDateCell = document.createElement('td');
-            startDateCell.textContent = formatDate(new Date(epicStartDateStr)); // Format start date for display
+            startDateCell.textContent = formatDate(new Date(epicStartDateStr));
 
             const epicStaffMonthsCell = document.createElement('td');
             epicStaffMonthsCell.textContent = epicStaffMonths;
 
             try {
                 const endDateCell = document.createElement('td');
-                const estimatedEndDate = calculateEndDate(epicStartDateStr, availableStaffData, epicStaffMonths); // Calculate epic end date
-                endDateCell.textContent = formatDate(new Date(estimatedEndDate)); // Format end date for display
+                // Pass the same staffDataCopy which gets mutated cumulatively
+                const estimatedEndDate = calculateEndDate(epicStartDateStr, staffDataCopy, epicStaffMonths);
+                endDateCell.textContent = formatDate(new Date(estimatedEndDate));
                 row.appendChild(epicCell);
                 row.appendChild(startDateCell);
                 row.appendChild(epicStaffMonthsCell);
                 row.appendChild(endDateCell);
             } catch (error) {
                 const errorCell = document.createElement('td');
-                errorCell.textContent = "Error: " + error.message; // Display error message if calculation fails
-                errorCell.colSpan = 4; // Span across all columns
+                errorCell.textContent = "Error: " + error.message;
+                errorCell.colSpan = 4;
                 row.appendChild(errorCell);
             }
 
-            epicTableBody.appendChild(row); // Append the row to the table body
+            epicTableBody.appendChild(row);
         }
-
     };
 
 
