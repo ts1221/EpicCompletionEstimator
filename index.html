@@ -30,23 +30,23 @@
                             <div class="form-row">
                                 <!-- Form group for the 'From Date' input -->
                                 <div class="form-group col-md-6">
-                                    <label for="staffFromDate">Start Date</label>
+                                    <label for="staffFromDate">Program Start Date</label>
                                     <input type="date" id="staffFromDate" class="form-control" required>
                                 </div>
                                 <!-- Form group for the 'Number of Months' input -->
                                 <div class="form-group col-md-6">
                                     <label for="numberOfMonths">Number of Months</label>
-                                    <input type="number" id="numberOfMonths" class="form-control" min="1" required>
+                                    <input type="number" id="numberOfMonths" class="form-control" min="1" step="1" required>
                                 </div>
                             </div>
                             <!-- Button to generate input fields for staff months -->
                             <button type="button" id="generateInputsBtn" class="btn btn-primary" onclick="generateStaffInputs()">Generate Inputs</button>
                             <!-- Submit button to update staff availability -->
-                            <button type="submit" id="updateStaffBtn" class="btn btn-primary" style="display: none;">Update Staff</button>
+                            <!-- <button type="submit" id="updateStaffBtn" class="btn btn-primary" style="display: none;">Update Staff</button> -->
                             <!-- Add this button to your HTML, initially hidden -->
                             <button type="button" id="addMonthBtn" class="btn btn-secondary mt-3" style="display: none;">Add Month</button>
 
-                        </form>
+                       
                         <!-- Container for dynamically generated input fields -->
                         <div id="staff-inputs" class="mt-4">
                             <!-- Dynamic input fields for staff months will be generated here -->
@@ -56,6 +56,11 @@
                             <!-- List of staff availability will be dynamically added here -->
                         </ul>
                     </div>
+                
+                  
+                    <button type="submit" id="updateStaffBtn" class="btn btn-primary" style="display: none;">Update Staff</button>
+      
+                 </form>
                 </div>
             </div>
             
@@ -73,14 +78,15 @@
                             <input type="number" id="numberOfEpics" class="form-control" min="1" step="1" required>
                             <!-- Button to generate input fields for epic details -->
                             <button type="button" id="displayEpicInputsBtn" class="btn btn-primary" onclick="validateAndDisplayEpics()">Generate Epic Inputs</button>
-                            <!-- Button to calculate and display epic end dates -->
-                            <button type="button" id="calculateBtn" class="btn btn-primary" onclick="generateEpics()" style="display: none;">Calculate End Dates</button>
+                    
                             <!-- <button type="button" id="addEpicBtn" class="btn btn-secondary mt-2" style="display: none;">Add Epic</button> -->
                         </div>
                         <!-- Container for dynamically generated input fields for epics -->
                         <div id="epic-inputs" class="mt-4">
                             <!-- Dynamic input fields for epics will be generated here -->
                         </div>
+                          <!-- Button to calculate and display epic end dates -->
+                            <button type="button" id="calculateBtn" class="btn btn-primary" onclick="generateEpics()" style="display: none;">Calculate End Dates</button>
                        
                         <!-- Table for displaying epic details -->
                         <table id="epic-table" class="table mt-4">
@@ -96,6 +102,23 @@
                                 <!-- Epic details will be dynamically added here -->
                             </tbody>
                         </table>
+                        <!-- Container for displaying the program end date -->
+                        <div id="program-end-date" class="mt-4">
+                            <!-- program end date will be displayed here -->
+                        </div>
+
+                                                <!-- Input for buffer percentage -->
+                        <div class="form-group mt-4">
+                            <label for="bufferPercentage">Buffer Percentage:</label>
+                            <input type="number" id="bufferPercentage" class="form-control" min="0" step="1" value="0" required>
+                            <!-- Button to apply buffer percentage -->
+                            <button type="button" id="applyBufferBtn" class="btn btn-primary mt-2" onclick="applyBuffer()">Apply Buffer</button>
+                        </div>
+
+                        <!-- Container for displaying the program end date with buffer -->
+                        <div id="program-end-date-with-buffer" class="mt-4">
+                            <!-- Program end date with buffer will be displayed here -->
+                        </div>
                     </div>
                 </div>
             </div>

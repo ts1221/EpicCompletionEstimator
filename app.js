@@ -1,4 +1,4 @@
-// TODO: add flags/dropdown menu for SW/FW teams
+
 document.addEventListener('DOMContentLoaded', function() {
     // This event listener ensures that the script runs only after the HTML document is fully loaded.
     // It ensures that all DOM elements are accessible.
@@ -42,10 +42,11 @@ function getNthMonthDate(startDate, n) {
 
 window.generateStaffInputs = function() {
         const fromDateStr = document.getElementById('staffFromDate').value;
-        const numberOfMonths = parseInt(document.getElementById('numberOfMonths').value, 10);
+        const numberOfMonths = parseFloat(document.getElementById('numberOfMonths').value, 10);
 
-        if (!fromDateStr || isNaN(numberOfMonths) || numberOfMonths < 1) {
-            alert('Please enter a valid start date and number of months.');
+        console.log(numberOfMonths);
+        if (!fromDateStr || isNaN(numberOfMonths) || numberOfMonths < 1 || !Number.isInteger(numberOfMonths)) {
+            alert('Please enter a valid start date and a whole number for the number of months.');
             return;
         }
 
@@ -72,55 +73,24 @@ window.generateStaffInputs = function() {
         monthLabelContainer.className = 'col-auto';
 
         const monthLabel = document.createElement('label');
-        monthLabel.textContent = `Month ${monthIndex + 1}: ${formatDate(currentDate)}`;
+        monthLabel.textContent = `Month ${monthIndex + 1}: ${formatDate(currentDate)} - Staff Months:`;
         monthLabelContainer.appendChild(monthLabel);
 
         const staffMonthsInputContainer = document.createElement('div');
-        staffMonthsInputContainer.className = 'col-auto d-flex align-items-center';
-
-
-        // decrement button
-        // const decrementBtn = document.createElement('button');
-        // decrementBtn.type = 'button';
-        // decrementBtn.className = 'btn btn-outline-secondary btn-sm mr-2';
-        // decrementBtn.textContent = '-';
-        // decrementBtn.addEventListener('click', () => {
-        //     const input = document.getElementById(`availableStaffMonths${monthIndex}`);
-        //     let val = parseInt(input.value, 10) || 0;
-        //     if (val > 0) {
-        //         input.value = val - 1;
-        //         checkInputs();
-        //     }
-        // });
-
+        staffMonthsInputContainer.className = 'col-auto d-flex align-items-center'
 
         // input element 
         const staffMonthsInput = document.createElement('input');
         staffMonthsInput.type = 'number';
         staffMonthsInput.className = 'form-control';
         staffMonthsInput.min = '0';
+         staffMonthsInput.step = '0.1';
         staffMonthsInput.id = `availableStaffMonths${monthIndex}`;
         staffMonthsInput.addEventListener('input', checkInputs);
 
 
-        // increment button
-        // const incrementBtn = document.createElement('button');
-        // incrementBtn.type = 'button';
-        // incrementBtn.className = 'btn btn-outline-secondary btn-sm mr-2';
-        // incrementBtn.textContent = '+';
-        // incrementBtn.addEventListener('click', () => {
-        //     const input = document.getElementById(`availableStaffMonths${monthIndex}`);
-        //     let val = parseInt(input.value, 10) || 0;
-        //     if (val > 0) {
-        //         input.value = val + 1;
-        //         checkInputs();
-        //     }
-        // });
-
         
-        // staffMonthsInputContainer.appendChild(decrementBtn);
         staffMonthsInputContainer.appendChild(staffMonthsInput);
-        // staffMonthsInputContainer.appendChild(incrementBtn);
 
         monthInputGroup.appendChild(monthLabelContainer);
         monthInputGroup.appendChild(staffMonthsInputContainer);
@@ -128,20 +98,6 @@ window.generateStaffInputs = function() {
     }
 
     function getNextMonthDate(date) {
-
-
-
-        // const year = date.getUTCFullYear();
-        // const month = date.getUTCMonth();
-        // const day = date.getUTCDate();
-
-        // const nextMonth = new Date(Date.UTC(year, month + 1, 1));
-
-        // const daysInNextMonth = new Date(Date.UTC(nextMonth.getUTCFullYear, nextMonth.getUTCMonth() + 1, 0)).getUTCDate();
-
-        // const lastDay = Math.min(day, daysInNextMonth);
-        // return new Date(Date.UTC(nextMonth.getUTCFullYear(), nextMonth.getUTCMonth(), lastDay));
-
 
         const newDate = new Date(date);
         newDate.setUTCDate(1); // Start at the first of the month to avoid rolling over
@@ -154,7 +110,7 @@ window.generateStaffInputs = function() {
     function checkInputs() {
         const inputs = document.querySelectorAll('[id^="availableStaffMonths"]');
         const allFieldsFilled = Array.from(inputs).every(input => {
-            const value = parseInt(input.value, 10);
+            const value = parseFloat(input.value, 10);
             return !isNaN(value) && value >= 0;
         });
 
@@ -168,7 +124,7 @@ window.generateStaffInputs = function() {
 
         for (let i = 0; i < numberOfMonths; i++) {
             const availableStaffMonthsInput = document.getElementById(`availableStaffMonths${i}`).value;
-            const availableStaffMonths = parseInt(availableStaffMonthsInput, 10);
+            const availableStaffMonths = parseFloat(availableStaffMonthsInput, 10);
 
             if (isNaN(availableStaffMonths) || availableStaffMonths < 0) {
                 alert(`Please enter a valid number of available staff months for Month ${i + 1}`);
@@ -217,11 +173,13 @@ window.generateStaffInputs = function() {
         addMonthBtn.disabled = true;
 
         const staffMonthsInput = document.getElementById(`availableStaffMonths${newMonthIndex}`);
+         staffMonthsInput.step = '0.1';  // Ensure decimal input is allowed
+
         const addMonthConfirmBtn = document.createElement('button');
         addMonthConfirmBtn.textContent = 'Confirm Add Month';
         addMonthConfirmBtn.className = 'btn btn-success mt-2';
         addMonthConfirmBtn.addEventListener('click', function() {
-            const availableStaffMonths = parseInt(staffMonthsInput.value, 10);
+            const availableStaffMonths = parseFloat(staffMonthsInput.value, 10);
 
             if (!isNaN(availableStaffMonths) && availableStaffMonths >= 0) {
                 const startDate = new Date(currentDate);
@@ -254,12 +212,6 @@ window.generateStaffInputs = function() {
         staffList.appendChild(listItem);
     }
 
-    // function normalizedDate(d) {
-    //     const date = new Date(d);
-    //     date.setHours(0, 0, 0, 0);
-    //     return date;    
-    // }
-
 
     function checkEpicInputs() {
         const rows = document.querySelectorAll('#epic-inputs .form-row');
@@ -275,8 +227,9 @@ window.generateStaffInputs = function() {
 
     window.validateAndDisplayEpics = function () {
         const numEpicsInput = document.getElementById('numberOfEpics');
-        const value = parseInt(numEpicsInput.value, 10);
+        const value = parseFloat(numEpicsInput.value, 10);
 
+        console.log(value);
         if (isNaN(value) || value < 1 || !Number.isInteger(value)) {
             alert('Please enter a valid number of epics');
             return;
@@ -336,6 +289,7 @@ window.generateStaffInputs = function() {
             epicStaffMonthsInput.type = 'number'; // Input type for numeric data
             epicStaffMonthsInput.className = 'form-control';
             epicStaffMonthsInput.min = '1'; // Minimum value constraint
+            epicStaffMonthsInput.step = '0.1';
             epicStaffMonthsInput.id = `epicStaffMonths${i}`; // Unique ID for each staff months input
             epicStaffMonthsContainer.appendChild(epicStaffMonthsInput);
 
@@ -361,6 +315,7 @@ window.generateStaffInputs = function() {
 
         // Deep copy staff data once, to track cumulative availability consumption
         const staffDataCopy = JSON.parse(JSON.stringify(availableStaffData));
+        let programEndDate = new Date(0); // Initialize to the earliest possible date
 
         for (let i = 0; i < numberOfEpics; i++) {
             const epicName = document.getElementById(`epicName${i}`).value || `Epic ${i + 1}`;
@@ -372,9 +327,9 @@ window.generateStaffInputs = function() {
             }
 
             const epicStaffMonthsInput = document.getElementById(`epicStaffMonths${i}`).value;
-            const epicStaffMonths = parseInt(epicStaffMonthsInput, 10);
+            const epicStaffMonths = parseFloat(epicStaffMonthsInput, 10);
 
-            if (isNaN(epicStaffMonths) || epicStaffMonths < 1) {
+            if (isNaN(epicStaffMonths) || epicStaffMonths < 0) {
                 alert(`Please enter a valid number of staff months for Epic ${i + 1}`);
                 return;
             }
@@ -383,7 +338,7 @@ window.generateStaffInputs = function() {
             const earliestStaff = availableStaffData.map(p => new Date(p.fromDate)).sort((a,b) => a - b)[0];
             const epicStart = new Date(`${epicStartDateStr}T00:00:00`);
             if (epicStart < earliestStaff) {
-                alert(`No staff available until ${formatDate(earliestStaff)}. Please move epic ${i+1} to that date or later`);
+                alert(`Epic start date can't start before the program start date. Please move epic ${i+1} to ${formatDate(earliestStaff)} or later`);
                 return;
             }
 
@@ -406,6 +361,10 @@ window.generateStaffInputs = function() {
                 row.appendChild(startDateCell);
                 row.appendChild(epicStaffMonthsCell);
                 row.appendChild(endDateCell);
+
+                if (estimatedEndDate > programEndDate) {
+                    programEndDate = estimatedEndDate;
+                }
             } catch (error) {
                 const errorCell = document.createElement('td');
                 errorCell.textContent = "Error: " + error.message;
@@ -415,6 +374,12 @@ window.generateStaffInputs = function() {
 
             epicTableBody.appendChild(row);
         }
+
+        // Display the program end date
+        if (programEndDate.getTime() !== new Date(0).getTime()) {
+            document.getElementById('program-end-date').innerHTML = `<strong>Program End Date:</strong> ${formatDate(new Date(programEndDate))}`;
+        }
+
     };
 
 
@@ -470,6 +435,29 @@ window.generateStaffInputs = function() {
 
         throw new Error("Not enough staff months available to complete the epic.");
     }
+
+    window.applyBuffer = function() {
+    const bufferPercentage = parseFloat(document.getElementById('bufferPercentage').value) || 0;
+
+    // Retrieve the program end date
+    const programEndDateElement = document.getElementById('program-end-date');
+    const programEndDateText = programEndDateElement.textContent.match(/(\d{2}\/\d{2}\/\d{4})/);
+    
+    if (!programEndDateText) {
+        alert("Program end date is not calculated yet.");
+        return;
+    }
+
+    const programEndDate = new Date(programEndDateText[0]);
+
+    // Calculate buffer days and apply to the program end date
+    const bufferDays = Math.ceil((bufferPercentage / 100) * (programEndDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    const programEndDateWithBuffer = new Date(programEndDate);
+    programEndDateWithBuffer.setDate(programEndDateWithBuffer.getDate() + bufferDays);
+
+    // Update the program end date with buffer display
+    document.getElementById('program-end-date-with-buffer').innerHTML = `<strong>Program End Date with Buffer:</strong> ${formatDate(programEndDateWithBuffer)}`;
+};
 
     // Function to format a date object into a string in MM/DD/YYYY format
     function formatDate(date) {
