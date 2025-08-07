@@ -42,3 +42,9 @@ h1 {
     border-color: #8bea58; /* Maintain dark green border color when button is focused */
     outline: none; /* Remove default focus outline for a cleaner look */
 }
+
+.custom-gap-color {
+    background-color: #bbdb9d; /* Example custom color */
+    color: #000000; /* Optional: text color */
+}
+
